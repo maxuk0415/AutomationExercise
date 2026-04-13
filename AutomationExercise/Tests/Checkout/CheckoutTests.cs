@@ -23,10 +23,12 @@ public class CheckoutTests : PlaywrightFixture, IClassFixture<BrowserFixture>
 
         var productsPage = new ProductsPage(Page);
         await productsPage.NavigateAsync();
+        await DismissConsentDialogAsync(); // WebKit 每次 Navigate 後 consent 可能重新出現
         await productsPage.AddFirstProductToCartAsync();
 
         var cartPage = new CartPage(Page);
         await cartPage.NavigateAsync();
+        await DismissConsentDialogAsync(); // 確保結帳按鈕不被遮住
         await cartPage.ClickCheckoutAsync();
     }
 

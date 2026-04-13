@@ -38,6 +38,7 @@ public class ProductsTests : PlaywrightFixture, IClassFixture<BrowserFixture>
     public async Task ShouldShowProductDetailWhenClickingOnProduct()
     {
         await _productsPage.ClickFirstProductAsync();
+        await DismissConsentDialogAsync(); // 商品詳情頁可能再次出現 consent
 
         var detailPage = new ProductDetailPage(Page);
         var productName = await detailPage.GetProductNameAsync();
