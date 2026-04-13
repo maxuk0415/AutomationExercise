@@ -51,8 +51,8 @@ public class ContactUsPage(IPage page)
     public async Task ClickHomeAsync()
     {
         await HomeButton.ScrollIntoViewIfNeededAsync();
-        await HomeButton.ClickAsync();
-        // 等待頁面 DOM 載入完成，兼容 WebKit 的導航時序
+        // DispatchEventAsync 繞過廣告 overlay，直接觸發導航
+        await HomeButton.DispatchEventAsync("click");
         await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
     }
 

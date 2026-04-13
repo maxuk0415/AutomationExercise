@@ -33,7 +33,11 @@ public class CartPage(IPage page)
         => await CartRows.Nth(rowIndex).Locator("td.cart_delete a").ClickAsync();
 
     public async Task ClickCheckoutAsync()
-        => await CheckoutButton.ClickAsync();
+    {
+        await CheckoutButton.ScrollIntoViewIfNeededAsync();
+        // DispatchEventAsync 繞過廣告 overlay，直接觸發導航
+        await CheckoutButton.DispatchEventAsync("click");
+    }
 
     public async Task<bool> IsLoginModalVisibleAsync()
         => await LoginModal.IsVisibleAsync();

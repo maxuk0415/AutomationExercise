@@ -78,8 +78,8 @@ public class ProductsPage(IPage page)
 
     public async Task ClickFirstProductAsync()
     {
-        // WebKit 需要元素在視窗內才能觸發點擊，先 scroll 再 click
         await ViewProductLinks.First.ScrollIntoViewIfNeededAsync();
-        await ViewProductLinks.First.ClickAsync();
+        // DispatchEventAsync 直接把 click 事件派發到元素，繞過任何廣告 overlay 的攔截
+        await ViewProductLinks.First.DispatchEventAsync("click");
     }
 }
