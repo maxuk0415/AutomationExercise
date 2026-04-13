@@ -53,7 +53,7 @@ public class ContactUsPage(IPage page)
         await HomeButton.ScrollIntoViewIfNeededAsync();
         await HomeButton.ClickAsync();
         // 等待頁面 DOM 載入完成，兼容 WebKit 的導航時序
-        await page.WaitForLoadStateAsync(LoadState.DomContentLoaded);
+        await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
     }
 
     public async Task<bool> IsSuccessMessageVisibleAsync()
