@@ -1,0 +1,26 @@
+# .NET build output
+bin/
+obj/
+publish/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# User-specific files
+*.user
+*.suo
+.vs/
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright browsers (installed at runtime in CI)
+**/ms-playwright/

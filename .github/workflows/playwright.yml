@@ -1,0 +1,52 @@
+name: Playwright E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: "${{ matrix.browser }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false        # 一個 browser 失敗，不取消其他 browser
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore AutomationExercise/AutomationExercise.csproj
+
+      - name: Build
+        run: dotnet build AutomationExercise/AutomationExercise.csproj --no-restore
+
+      - name: Install Playwright browsers
+        run: |
+          dotnet publish AutomationExercise/AutomationExercise.csproj -o ./publish
+          pwsh ./publish/.playwright/node/linux-x64/native/playwright.ps1 install --with-deps ${{ matrix.browser }}
+
+      - name: Run tests
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: |
+          dotnet test AutomationExercise/AutomationExercise.csproj \
+            --no-build \
+            --logger "trx;LogFileName=results-${{ matrix.browser }}.trx" \
+            --results-directory ./TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.browser }}
+          path: TestResults/results-${{ matrix.browser }}.trx
