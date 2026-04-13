@@ -63,16 +63,20 @@ public class ProductsPage(IPage page)
     public async Task FilterByCategoryAsync(string category, string subCategory)
     {
         await CategoryLink(category).ClickAsync();
-        // 等待 Accordion 展開後，子分類連結才會可見
-        // subCatLink 限定在 #{category} panel 內，避免跨分類誤選（如 Women/Dress vs Kids/Dress）
         var subCatLink = SubCategoryLink(category, subCategory);
-        await subCatLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
-        await subCatLink.ClickAsync();
+        // 等待元素進入 DOM（WebKit 的 accordion 動畫可能讓元素長時間停在 hidden 狀態）
+        // 用 Attached 取代 Visible，再 Force=true 略過 visibility check
+        await subCatLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Attached });
+        await subCatLink.ClickAsync(new LocatorClickOptions { Force = true });
     }
 
     public async Task FilterByBrandAsync(string brandName)
         => await BrandLink(brandName).ClickAsync();
 
     public async Task ClickFirstProductAsync()
-        => await ViewProductLinks.First.ClickAsync();
+    {
+        // WebKit 需要元素在視窗內才能觸發點擊，先 scroll 再 click
+        await ViewProductLinks.First.ScrollIntoViewIfNeededAsync();
+        await ViewProductLinks.First.ClickAsync();
+    }
 }

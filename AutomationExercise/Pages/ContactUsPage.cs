@@ -49,7 +49,12 @@ public class ContactUsPage(IPage page)
         => await FileInput.SetInputFilesAsync(filePath);
 
     public async Task ClickHomeAsync()
-        => await HomeButton.ClickAsync();
+    {
+        await HomeButton.ScrollIntoViewIfNeededAsync();
+        await HomeButton.ClickAsync();
+        // WebKit 點擊後需等待 URL 離開 /contact_us，才能驗證導航成功
+        await page.WaitForURLAsync(url => !url.Contains(Urls.ContactUs), new PageWaitForURLOptions { Timeout = 10000 });
+    }
 
     public async Task<bool> IsSuccessMessageVisibleAsync()
     {
