@@ -18,7 +18,8 @@ public class ProductDetailPage(IPage page)
     // --- Methods ---
     public async Task<string> GetProductNameAsync()
     {
-        await ProductName.WaitForAsync(new LocatorWaitForOptions { Timeout = 15000 });
+        // 30s timeout：WebKit CI 在產品詳情頁渲染較慢（DismissConsentDialog 消耗額外時間）
+        await ProductName.WaitForAsync(new LocatorWaitForOptions { Timeout = 30000 });
         return await ProductName.InnerTextAsync();
     }
 

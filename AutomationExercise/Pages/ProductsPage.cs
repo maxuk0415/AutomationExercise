@@ -68,10 +68,12 @@ public class ProductsPage(IPage page)
         var subCatLink = SubCategoryLink(category, subCategory);
         // 等元素進入 DOM（WebKit accordion 動畫期間元素是 CSS hidden，Visible 永遠等不到）
         await subCatLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Attached, Timeout = 10000 });
-        // 用 JS native click：直接呼叫元素的 .click()，繞過 CSS visibility 限制
-        // 比 Force=true 更安全：觸發正確的 href 導航，不模擬滑鼠座標
+        // JS native click 繞過 CSS visibility 限制（WebKit accordion）
         await subCatLink.EvaluateAsync("el => el.click()");
-        await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+        // WaitForURLAsync：等待 URL 變更為 /category_products/...
+        // 比 WaitForLoadStateAsync 安全：不會在舊頁面已 loaded 時立刻 resolve（Chromium race condition）
+        await page.WaitForURLAsync("**/category_products/**",
+            new PageWaitForURLOptions { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 10000 });
     }
 
     public async Task FilterByBrandAsync(string brandName)
@@ -81,5 +83,8 @@ public class ProductsPage(IPage page)
     {
         await ViewProductLinks.First.ScrollIntoViewIfNeededAsync();
         await ViewProductLinks.First.ClickAsync();
+        // WaitForURLAsync：確保頁面已導向 /product_details/...（WebKit ClickAsync 後 navigation 可能未完成）
+        await page.WaitForURLAsync("**/product_details/**",
+            new PageWaitForURLOptions { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 15000 });
     }
 }
