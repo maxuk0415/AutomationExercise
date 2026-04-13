@@ -31,7 +31,10 @@ jobs:
         run: dotnet build AutomationExercise/AutomationExercise.csproj --no-restore
 
       - name: Install Playwright browsers
-        run: pwsh AutomationExercise/bin/Debug/net10.0/.playwright/node/linux-x64/native/playwright.ps1 install --with-deps ${{ matrix.browser }}
+        run: |
+          PLAYWRIGHT=$(find . -name "playwright.ps1" | head -1)
+          echo "Found Playwright script at: $PLAYWRIGHT"
+          pwsh -File "$PLAYWRIGHT" install --with-deps ${{ matrix.browser }}
 
       - name: Run tests
         env:
