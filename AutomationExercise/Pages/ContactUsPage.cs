@@ -52,8 +52,8 @@ public class ContactUsPage(IPage page)
     {
         await HomeButton.ScrollIntoViewIfNeededAsync();
         await HomeButton.ClickAsync();
-        // WebKit 點擊後需等待 URL 離開 /contact_us，才能驗證導航成功
-        await page.WaitForURLAsync(url => !url.Contains(Urls.ContactUs), new PageWaitForURLOptions { Timeout = 10000 });
+        // 等待頁面 DOM 載入完成，兼容 WebKit 的導航時序
+        await page.WaitForLoadStateAsync(LoadState.DomContentLoaded);
     }
 
     public async Task<bool> IsSuccessMessageVisibleAsync()

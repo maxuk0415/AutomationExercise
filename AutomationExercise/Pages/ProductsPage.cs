@@ -62,12 +62,15 @@ public class ProductsPage(IPage page)
 
     public async Task FilterByCategoryAsync(string category, string subCategory)
     {
-        await CategoryLink(category).ClickAsync();
+        // 先 scroll 到分類標題，確保在 WebKit 的視窗內再點擊
+        var catLink = CategoryLink(category);
+        await catLink.ScrollIntoViewIfNeededAsync();
+        await catLink.ClickAsync();
+        // 等待子分類可見（accordion 展開動畫完成），加大 timeout 以兼容 WebKit 較慢的動畫
         var subCatLink = SubCategoryLink(category, subCategory);
-        // 等待元素進入 DOM（WebKit 的 accordion 動畫可能讓元素長時間停在 hidden 狀態）
-        // 用 Attached 取代 Visible，再 Force=true 略過 visibility check
-        await subCatLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Attached });
-        await subCatLink.ClickAsync(new LocatorClickOptions { Force = true });
+        await subCatLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible, Timeout = 60000 });
+        await subCatLink.ScrollIntoViewIfNeededAsync();
+        await subCatLink.ClickAsync();
     }
 
     public async Task FilterByBrandAsync(string brandName)

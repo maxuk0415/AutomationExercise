@@ -17,7 +17,10 @@ public class ProductDetailPage(IPage page)
 
     // --- Methods ---
     public async Task<string> GetProductNameAsync()
-        => await ProductName.InnerTextAsync();
+    {
+        await ProductName.WaitForAsync(new LocatorWaitForOptions { Timeout = 15000 });
+        return await ProductName.InnerTextAsync();
+    }
 
     public async Task<string> GetProductPriceAsync()
         => await ProductPrice.InnerTextAsync();
