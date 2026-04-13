@@ -35,8 +35,7 @@ public class CartPage(IPage page)
     public async Task ClickCheckoutAsync()
     {
         await CheckoutButton.ScrollIntoViewIfNeededAsync();
-        // DispatchEventAsync 繞過廣告 overlay，直接觸發導航
-        await CheckoutButton.DispatchEventAsync("click");
+        await CheckoutButton.ClickAsync();
     }
 
     public async Task<bool> IsLoginModalVisibleAsync()

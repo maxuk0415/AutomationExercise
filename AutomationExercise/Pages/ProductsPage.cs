@@ -79,7 +79,6 @@ public class ProductsPage(IPage page)
     public async Task ClickFirstProductAsync()
     {
         await ViewProductLinks.First.ScrollIntoViewIfNeededAsync();
-        // DispatchEventAsync 直接把 click 事件派發到元素，繞過任何廣告 overlay 的攔截
-        await ViewProductLinks.First.DispatchEventAsync("click");
+        await ViewProductLinks.First.ClickAsync();
     }
 }

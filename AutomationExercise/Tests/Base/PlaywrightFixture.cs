@@ -45,6 +45,29 @@ public class PlaywrightFixture : IAsyncLifetime
         });
 
         Page = await _context.NewPageAsync();
+
+        // 每次頁面載入後自動隱藏廣告 overlay iframe，避免攔截點擊（在 WebKit CI 上特別明顯）
+        // setInterval 每秒執行確保動態插入的廣告也被處理
+        await Page.AddInitScriptAsync(@"
+            const hideAdOverlays = () => {
+                document.querySelectorAll('iframe[id^=""aswift""]').forEach(el => {
+                    el.style.pointerEvents = 'none';
+                    el.style.display = 'none';
+                });
+                document.querySelectorAll('ins.adsbygoogle').forEach(el => {
+                    el.style.pointerEvents = 'none';
+                });
+                document.querySelectorAll('div[id^=""google_ads""]').forEach(el => {
+                    el.style.pointerEvents = 'none';
+                });
+            };
+            if (document.readyState !== 'loading') {
+                hideAdOverlays();
+            } else {
+                document.addEventListener('DOMContentLoaded', hideAdOverlays);
+            }
+            setInterval(hideAdOverlays, 500);
+        ");
     }
 
     // DisposeAsync = 每個 [Fact] 執行後自動跑
