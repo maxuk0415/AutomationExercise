@@ -31,8 +31,9 @@ jobs:
         run: dotnet build AutomationExercise/AutomationExercise.csproj --no-restore
 
       - name: Install Playwright browsers
+        timeout-minutes: 10
         run: |
-          PLAYWRIGHT=$(find . -name "playwright.ps1" | head -1)
+          PLAYWRIGHT=$(find AutomationExercise/bin -name "playwright.ps1" | head -1)
           echo "Found Playwright script at: $PLAYWRIGHT"
           pwsh -File "$PLAYWRIGHT" install --with-deps ${{ matrix.browser }}
 
