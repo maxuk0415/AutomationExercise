@@ -85,11 +85,11 @@ public class ProductsPage(IPage page)
 
     public async Task ClickFirstProductAsync()
     {
-        await ViewProductLinks.First.ScrollIntoViewIfNeededAsync();
-        // Force = true：.choose div 的 View Product 連結在 CSS hover 才顯示（WebKit 同 Add to Cart 問題）
-        await ViewProductLinks.First.ClickAsync(new LocatorClickOptions { Force = true });
-        // WaitForURLAsync 30s：等待 URL 確實變成 /product_details/...
-        await page.WaitForURLAsync("**/product_details/**",
-            new PageWaitForURLOptions { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 30000 });
+        // .choose div 在 WebKit 可能是 display:none（無 layout box）
+        // Force=true 無效：會點到 (0,0) 座標而非連結本身
+        // 改用：從 DOM 取得 href 屬性，直接以 GotoAsync 導航，完全不依賴 CSS visibility
+        var href = await ViewProductLinks.First.EvaluateAsync<string>("el => el.getAttribute('href')");
+        await page.GotoAsync(Urls.Base + href,
+            new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
     }
 }

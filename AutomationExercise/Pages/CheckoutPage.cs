@@ -28,5 +28,11 @@ public class CheckoutPage(IPage page)
         => await CommentTextArea.FillAsync(comment);
 
     public async Task PlaceOrderAsync()
-        => await PlaceOrderBtn.ClickAsync();
+    {
+        await PlaceOrderBtn.ScrollIntoViewIfNeededAsync();
+        await PlaceOrderBtn.ClickAsync();
+        // 等待導航至付款頁面；若不等待，FillPaymentDetailsAsync 會在舊頁面找不到 input → 30s timeout
+        await page.WaitForURLAsync("**/payment",
+            new PageWaitForURLOptions { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 30000 });
+    }
 }

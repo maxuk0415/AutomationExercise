@@ -52,7 +52,10 @@ public class ContactUsPage(IPage page)
     {
         await HomeButton.ScrollIntoViewIfNeededAsync();
         await HomeButton.ClickAsync();
-        await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+        // WaitForLoadStateAsync 在 WebKit 會立刻 resolve（當前頁面已 loaded）→ URL 尚未變更
+        // 改用 WaitForURLAsync 等 URL 確實變為首頁後再繼續
+        await page.WaitForURLAsync(Urls.Base + "/",
+            new PageWaitForURLOptions { Timeout = 10000 });
     }
 
     public async Task<bool> IsSuccessMessageVisibleAsync()
