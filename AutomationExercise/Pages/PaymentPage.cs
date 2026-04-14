@@ -27,7 +27,7 @@ public class PaymentPage(IPage page)
         await CardNameInput.WaitForAsync(new LocatorWaitForOptions
         {
             State = WaitForSelectorState.Visible,
-            Timeout = 30000
+            Timeout = 60000
         });
         await CardNameInput.FillAsync(cardName);
         await CardNumberInput.FillAsync(cardNumber);

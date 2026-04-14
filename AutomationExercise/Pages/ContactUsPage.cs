@@ -58,7 +58,7 @@ public class ContactUsPage(IPage page)
         await page.WaitForFunctionAsync(
             "() => !window.location.href.includes('contact_us')",
             null,
-            new PageWaitForFunctionOptions { Timeout = 15000 });
+            new PageWaitForFunctionOptions { Timeout = 20000 });
     }
 
     public async Task<bool> IsSuccessMessageVisibleAsync()
