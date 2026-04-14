@@ -33,6 +33,8 @@ public class ProductsPage(IPage page)
     {
         await SearchInput.FillAsync(keyword);
         await SearchButton.ClickAsync();
+        // WebKit：搜尋後頁面需要時間更新，等 DOM 穩定後再讀取結果數量
+        await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
     }
 
     public async Task<int> GetProductCountAsync()
@@ -55,8 +57,10 @@ public class ProductsPage(IPage page)
 
     public async Task AddFirstProductToCartAsync()
     {
-        await AddToCartButtons.First.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
-        await AddToCartButtons.First.ClickAsync();
+        await AddToCartButtons.First.ScrollIntoViewIfNeededAsync();
+        // Force = true：.productinfo 的 Add to Cart 按鈕在 CSS hover 狀態才 visible（WebKit 無法自動觸發 hover）
+        // WaitForAsync(Visible) 在 WebKit 會直接 timeout；Force 繞過 visibility 直接點擊 DOM 元素
+        await AddToCartButtons.First.ClickAsync(new LocatorClickOptions { Force = true });
         await ContinueShoppingBtn.ClickAsync();
     }
 
@@ -82,9 +86,10 @@ public class ProductsPage(IPage page)
     public async Task ClickFirstProductAsync()
     {
         await ViewProductLinks.First.ScrollIntoViewIfNeededAsync();
-        await ViewProductLinks.First.ClickAsync();
-        // WaitForURLAsync：確保頁面已導向 /product_details/...（WebKit ClickAsync 後 navigation 可能未完成）
+        // Force = true：.choose div 的 View Product 連結在 CSS hover 才顯示（WebKit 同 Add to Cart 問題）
+        await ViewProductLinks.First.ClickAsync(new LocatorClickOptions { Force = true });
+        // WaitForURLAsync 30s：等待 URL 確實變成 /product_details/...
         await page.WaitForURLAsync("**/product_details/**",
-            new PageWaitForURLOptions { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 15000 });
+            new PageWaitForURLOptions { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 30000 });
     }
 }
