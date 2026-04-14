@@ -23,6 +23,12 @@ public class PaymentPage(IPage page)
         string expiryMonth,
         string expiryYear)
     {
+        // WaitForAsync：確保付款頁面已載入（PlaceOrderAsync 點擊後導航可能在 WebKit 較慢）
+        await CardNameInput.WaitForAsync(new LocatorWaitForOptions
+        {
+            State = WaitForSelectorState.Visible,
+            Timeout = 30000
+        });
         await CardNameInput.FillAsync(cardName);
         await CardNumberInput.FillAsync(cardNumber);
         await CvcInput.FillAsync(cvc);
