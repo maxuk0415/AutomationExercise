@@ -5,6 +5,10 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    # 每天 UTC 00:00（台灣時間早上 08:00）自動執行三瀏覽器完整測試
+    # 用於監控 WebKit 長期穩定性，與每次 push 的快速回饋分開
+    - cron: '0 0 * * *'
 
 jobs:
   test:
