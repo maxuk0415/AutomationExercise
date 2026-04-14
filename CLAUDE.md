@@ -82,6 +82,11 @@ automationexercise.com 的 API 永遠回傳 HTTP 200，真正的錯誤在 JSON b
 | ApiTests | 8 | productsList、brandsList、searchProduct、verifyLogin |
 | **Total** | **30** | |
 
+## CI/CD 策略
+- **每次 push/PR**：Chromium、Firefox 失敗則 block；WebKit 使用 `continue-on-error`（結果可見但不 block pipeline）
+- **夜間排程（UTC 00:00，台灣 08:00）**：三瀏覽器完整執行，監控 WebKit 長期穩定性
+- **WebKit non-blocking 原因**：automationexercise.com 有廣告和 consent dialog，在 GitHub Actions 共享 runner 上行為不穩定，屬於基礎設施變因而非測試或應用程式 bug
+
 ## 不測的項目（有意識排除）
 - API Testing 文件頁（無 UI 互動）
 - YouTube 連結（第三方）

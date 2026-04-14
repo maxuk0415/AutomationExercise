@@ -68,7 +68,15 @@ dotnet test --filter "FullyQualifiedName~Tests.Auth"
 
 ## CI/CD
 
-GitHub Actions runs all 30 tests on **Chromium**, **Firefox**, and **WebKit** in parallel on every push.
+GitHub Actions runs all 30 tests on **Chromium**, **Firefox**, and **WebKit** in parallel.
+
+| Trigger | Browsers | Behaviour |
+|---------|----------|-----------|
+| push / pull request | Chromium, Firefox, WebKit | Chromium & Firefox **block** CI on failure. WebKit is **non-blocking** (`continue-on-error`) — results are still visible but transient flakiness on shared runners does not fail the pipeline. |
+| Nightly schedule (UTC 00:00) | Chromium, Firefox, WebKit | Full 3-browser run to monitor WebKit stability over time. |
+
+> **Why non-blocking WebKit?**  
+> `automationexercise.com` serves real ads and consent dialogs whose behaviour varies with network latency and runner performance. WebKit headless is more sensitive to these conditions than Chromium/Firefox. Intermittent failures here reflect infrastructure variability, not test or application bugs.
 
 See `.github/workflows/playwright.yml`.
 
