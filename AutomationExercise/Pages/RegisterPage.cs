@@ -40,6 +40,12 @@ public class RegisterPage(IPage page)
         string dobMonth = "5",
         string dobYear  = "1990")
     {
+        // 等待表單第一個可互動元素，確保頁面已完全載入（Firefox 有時導航稍慢）
+        await PasswordInput.WaitForAsync(new LocatorWaitForOptions
+        {
+            State = WaitForSelectorState.Visible,
+            Timeout = 15000
+        });
         await TitleMrRadio.ClickAsync();
         await PasswordInput.FillAsync(password);
         await DayDropdown.SelectOptionAsync(dobDay);
@@ -60,7 +66,8 @@ public class RegisterPage(IPage page)
 
     public async Task<string> GetAccountCreatedMessageAsync()
     {
-        await AccountCreatedMsg.WaitForAsync(new LocatorWaitForOptions { Timeout = 30000 });
+        // 60s timeout：CI 環境下網站後端有時偏慢，30s 不夠用（Firefox 觀察到 2 次連續 timeout）
+        await AccountCreatedMsg.WaitForAsync(new LocatorWaitForOptions { Timeout = 60000 });
         return await AccountCreatedMsg.InnerTextAsync();
     }
 }
