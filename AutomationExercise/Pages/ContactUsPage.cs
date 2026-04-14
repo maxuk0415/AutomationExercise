@@ -52,10 +52,13 @@ public class ContactUsPage(IPage page)
     {
         await HomeButton.ScrollIntoViewIfNeededAsync();
         await HomeButton.ClickAsync();
-        // NetworkIdle：等待導航完成且所有資源載入完畢
-        // 比 WaitForURLAsync 安全：不依賴 URL 結尾格式（WebKit → "example.com"，Chromium → "example.com/"）
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle,
-            new PageWaitForLoadStateOptions { Timeout = 15000 });
+        // WaitForFunctionAsync：在瀏覽器端輪詢直到 URL 確實離開 contact_us 頁面
+        // 比 NetworkIdle / WaitForLoadState 更可靠：不會因當前頁面已 idle 而立即 resolve
+        // 比 WaitForURLAsync(string) 更可靠：不依賴精確 URL 格式（trailing slash 差異）
+        await page.WaitForFunctionAsync(
+            "() => !window.location.href.includes('contact_us')",
+            null,
+            new PageWaitForFunctionOptions { Timeout = 15000 });
     }
 
     public async Task<bool> IsSuccessMessageVisibleAsync()
