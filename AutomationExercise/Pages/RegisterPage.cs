@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責點擊 Signup 後跳轉的詳細帳號建立表單頁面。
+/// Handles the detailed account creation form page shown after clicking Signup.
 /// </summary>
 public class RegisterPage(IPage page)
 {
@@ -40,7 +40,7 @@ public class RegisterPage(IPage page)
         string dobMonth = "5",
         string dobYear  = "1990")
     {
-        // 等待表單第一個可互動元素，確保頁面已完全載入（Firefox 有時導航稍慢）
+        // Wait for the first interactive form element to ensure the page is fully loaded (Firefox can be slightly slow to navigate)
         await PasswordInput.WaitForAsync(new LocatorWaitForOptions
         {
             State = WaitForSelectorState.Visible,
@@ -66,7 +66,7 @@ public class RegisterPage(IPage page)
 
     public async Task<string> GetAccountCreatedMessageAsync()
     {
-        // 60s timeout：CI 環境下網站後端有時偏慢，30s 不夠用（Firefox 觀察到 2 次連續 timeout）
+        // 60s timeout: the site backend can be slow in CI — 30s was insufficient (Firefox timed out twice)
         await AccountCreatedMsg.WaitForAsync(new LocatorWaitForOptions { Timeout = 60000 });
         return await AccountCreatedMsg.InnerTextAsync();
     }

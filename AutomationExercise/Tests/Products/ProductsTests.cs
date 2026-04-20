@@ -1,17 +1,17 @@
 using AutomationExercise.Pages;
 using AutomationExercise.Tests.Base;
-using ProductData = AutomationExercise.Products; // alias 避免與 Tests.Products namespace 衝突
+using ProductData = AutomationExercise.Products; // alias to avoid conflict with Tests.Products namespace
 
 namespace AutomationExercise.Tests.Products;
 
 /// <summary>
-/// 測試產品瀏覽功能：顯示商品、商品詳情、分類篩選、品牌篩選、搜尋。
+/// Tests product browsing: displaying products, product detail, category filtering, brand filtering, search.
 ///
-/// SetUp 策略：override InitializeAsync（等同 NUnit 的 [SetUp]）
-/// 原因：所有測試都從 /products 開始，統一導航，避免每個 test 重複寫。
+/// SetUp strategy: override InitializeAsync (equivalent to NUnit's [SetUp])
+/// Reason: all tests start from /products, so navigation is centralised to avoid repeating it in each test.
 ///
-/// 注意：_productsPage 不能在 constructor 初始化，因為 Page 在 base.InitializeAsync()
-/// 之後才會被建立。必須在 override InitializeAsync 裡，呼叫 base 之後才能初始化。
+/// Note: _productsPage cannot be initialised in the constructor because Page is only available
+/// after base.InitializeAsync() completes. It must be initialised in override InitializeAsync, after calling base.
 /// </summary>
 public class ProductsTests : PlaywrightFixture, IClassFixture<BrowserFixture>
 {
@@ -21,8 +21,8 @@ public class ProductsTests : PlaywrightFixture, IClassFixture<BrowserFixture>
 
     public override async Task InitializeAsync()
     {
-        await base.InitializeAsync();             // 先讓 base 建立 Page
-        _productsPage = new ProductsPage(Page);   // Page 現在已可用
+        await base.InitializeAsync();             // let base create the Page first
+        _productsPage = new ProductsPage(Page);   // Page is now available
         await _productsPage.NavigateAsync();
         await DismissConsentDialogAsync();
     }
@@ -38,7 +38,7 @@ public class ProductsTests : PlaywrightFixture, IClassFixture<BrowserFixture>
     public async Task ShouldShowProductDetailWhenClickingOnProduct()
     {
         await _productsPage.ClickFirstProductAsync();
-        await DismissConsentDialogAsync(); // 商品詳情頁可能再次出現 consent
+        await DismissConsentDialogAsync(); // consent may reappear on the product detail page
 
         var detailPage = new ProductDetailPage(Page);
         var productName = await detailPage.GetProductNameAsync();

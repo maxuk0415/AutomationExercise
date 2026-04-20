@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責 /contact_us 頁面：填寫並送出聯絡表單。
+/// Handles the /contact_us page: fill in and submit the contact form.
 /// </summary>
 public class ContactUsPage(IPage page)
 {
@@ -31,8 +31,8 @@ public class ContactUsPage(IPage page)
 
     public async Task SubmitFormAsync()
     {
-        // 必須在 Click 之前掛上 Dialog handler，否則 dialog 可能在 handler 註冊前就出現
-        // 使用具名方法讓 handler 在執行一次後自動移除，避免影響後續操作
+        // The dialog handler must be registered before clicking, otherwise the dialog may appear before the handler is attached
+        // Using a named method so the handler removes itself after firing once, preventing interference with subsequent operations
         void Handler(object? _, IDialog dialog)
         {
             _ = dialog.AcceptAsync();
@@ -52,9 +52,9 @@ public class ContactUsPage(IPage page)
     {
         await HomeButton.ScrollIntoViewIfNeededAsync();
         await HomeButton.ClickAsync();
-        // WaitForFunctionAsync：在瀏覽器端輪詢直到 URL 確實離開 contact_us 頁面
-        // 比 NetworkIdle / WaitForLoadState 更可靠：不會因當前頁面已 idle 而立即 resolve
-        // 比 WaitForURLAsync(string) 更可靠：不依賴精確 URL 格式（trailing slash 差異）
+        // WaitForFunctionAsync: polls in the browser until the URL has actually left the contact_us page
+        // More reliable than NetworkIdle / WaitForLoadState: won't resolve immediately if the current page is already idle
+        // More reliable than WaitForURLAsync(string): not sensitive to exact URL format differences (trailing slash, etc.)
         await page.WaitForFunctionAsync(
             "() => !window.location.href.includes('contact_us')",
             null,

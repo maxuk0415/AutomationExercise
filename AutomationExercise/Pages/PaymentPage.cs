@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責付款頁面：填入信用卡資料並送出訂單。
+/// Handles the payment page: fill in credit card details and submit the order.
 /// </summary>
 public class PaymentPage(IPage page)
 {
@@ -23,7 +23,7 @@ public class PaymentPage(IPage page)
         string expiryMonth,
         string expiryYear)
     {
-        // WaitForAsync：確保付款頁面已載入（PlaceOrderAsync 點擊後導航可能在 WebKit 較慢）
+        // WaitForAsync: ensures the payment page has loaded (navigation after PlaceOrderAsync can be slower in WebKit)
         await CardNameInput.WaitForAsync(new LocatorWaitForOptions
         {
             State = WaitForSelectorState.Visible,

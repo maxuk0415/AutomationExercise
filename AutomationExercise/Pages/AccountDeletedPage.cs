@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責帳號刪除確認頁面（/delete_account）：確認刪除成功訊息。
+/// Handles the account deletion confirmation page (/delete_account): verify deletion success message.
 /// </summary>
 public class AccountDeletedPage(IPage page)
 {

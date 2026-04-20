@@ -3,8 +3,8 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責首頁（/）：輪播、特色商品、訂閱功能。
-/// 導航列操作請使用 NavBarPage。
+/// Handles the home page (/): carousel, featured products, and subscription.
+/// For navigation bar interactions, use NavBarPage.
 /// </summary>
 public class HomePage(IPage page)
 {

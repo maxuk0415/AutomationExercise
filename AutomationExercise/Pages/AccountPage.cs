@@ -3,12 +3,12 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責登入後的帳號頁面（/account）：驗證登入狀態、刪除帳號。
+/// Handles the post-login account page (/account): verifying login state and deleting the account.
 /// </summary>
 public class AccountPage(IPage page)
 {
     // --- Locators ---
-    // 注意：「Logged in as」是 NavBar 的元素，登入狀態驗證請使用 NavBarPage
+    // Note: "Logged in as" is a NavBar element — use NavBarPage to verify login state
     private ILocator DeleteAccountBtn => page.Locator("a[href='/delete_account']");
     private ILocator LogoutLink       => page.Locator("a[href='/logout']");
 

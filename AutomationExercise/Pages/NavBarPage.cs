@@ -3,13 +3,13 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 封裝網站頂部導航列（header nav），幾乎所有頁面都有。
-/// 集中管理導航 locator，避免每個 Page Object 重複定義相同的 selector。
+/// Encapsulates the site's top navigation bar (header nav), present on almost every page.
+/// Centralises navigation locators to avoid redefining the same selectors across Page Objects.
 /// </summary>
 public class NavBarPage(IPage page)
 {
     // --- Locators ---
-    // 加上 header 父容器限制，避免與頁面上其他指向 "/" 的連結（例如 logo）混淆
+    // Scoped to the header parent to avoid ambiguity with other links pointing to "/" (e.g. logo)
     private ILocator HomeLink       => page.Locator("header a[href='/']");
     private ILocator ProductsLink   => page.Locator("a[href='/products']");
     private ILocator CartLink       => page.Locator("a[href='/view_cart']");
@@ -41,7 +41,7 @@ public class NavBarPage(IPage page)
     {
         try
         {
-            // 等待元素出現（最多 10 秒），適用於登入後頁面跳轉的情況
+            // Wait for element to appear (up to 10 seconds), suitable for post-login page transitions
             await LoggedInAsText.WaitForAsync(new LocatorWaitForOptions { Timeout = 10000 });
             return true;
         }
@@ -54,7 +54,7 @@ public class NavBarPage(IPage page)
     public async Task<string> GetLoggedInUsernameAsync()
     {
         var text = await LoggedInAsText.InnerTextAsync();
-        // 格式為 "Logged in as Max AutoTest"，取出名字部分
+        // Format is "Logged in as Max AutoTest" — extract the name portion
         return text.Replace("Logged in as ", "").Trim();
     }
 

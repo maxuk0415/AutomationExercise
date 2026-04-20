@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責付款完成頁面：確認訂單成功訊息。
+/// Handles the payment confirmation page: verify order success message.
 /// </summary>
 public class PaymentDonePage(IPage page)
 {

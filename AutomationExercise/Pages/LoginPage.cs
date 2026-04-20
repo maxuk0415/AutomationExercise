@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責 /login 頁面的登入表單和註冊入口。
+/// Handles the /login page: login form and signup entry point.
 /// </summary>
 public class LoginPage(IPage page)
 {

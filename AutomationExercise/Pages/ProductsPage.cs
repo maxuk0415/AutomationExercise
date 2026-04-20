@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責 /products 頁面：搜尋、篩選、加入購物車。
+/// Handles the /products page: search, filter, and add to cart.
 /// </summary>
 public class ProductsPage(IPage page)
 {
@@ -17,10 +17,10 @@ public class ProductsPage(IPage page)
     private ILocator ViewCartLink        => page.Locator("u:text('View Cart')");
     private ILocator ViewProductLinks    => page.Locator(".choose a:text('View Product')");
 
-    // --- Dynamic Locators（動態值用方法回傳 ILocator，不散落在方法裡）---
-    // 分類標題連結（如 "Women"、"Men"），id 對應展開的 panel
+    // --- Dynamic Locators (dynamic values returned as ILocator methods, not inlined) ---
+    // Category title link (e.g. "Women", "Men") — id corresponds to the expanded panel
     private ILocator CategoryLink(string name)    => page.Locator($".panel-title a:has-text('{name}')");
-    // 子分類連結：限定在 parent category panel 內，避免跨分類誤選（如 Women/Dress vs Kids/Dress）
+    // Sub-category link: scoped inside the parent category panel to avoid cross-category mismatches (e.g. Women/Dress vs Kids/Dress)
     private ILocator SubCategoryLink(string category, string subCategory)
         => page.Locator($"#{category} a:has-text('{subCategory}')");
     private ILocator BrandLink(string brand)      => page.Locator($".brands-name a:has-text('{brand}')");
@@ -33,7 +33,7 @@ public class ProductsPage(IPage page)
     {
         await SearchInput.FillAsync(keyword);
         await SearchButton.ClickAsync();
-        // WebKit：搜尋後頁面需要時間更新，等 DOM 穩定後再讀取結果數量
+        // WebKit: the page needs time to update after searching — wait for DOM to settle before reading results
         await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
     }
 
@@ -58,8 +58,8 @@ public class ProductsPage(IPage page)
     public async Task AddFirstProductToCartAsync()
     {
         await AddToCartButtons.First.ScrollIntoViewIfNeededAsync();
-        // Force = true：.productinfo 的 Add to Cart 按鈕在 CSS hover 狀態才 visible（WebKit 無法自動觸發 hover）
-        // WaitForAsync(Visible) 在 WebKit 會直接 timeout；Force 繞過 visibility 直接點擊 DOM 元素
+        // Force = true: the Add to Cart button inside .productinfo is only visible on CSS hover (WebKit cannot trigger hover automatically)
+        // WaitForAsync(Visible) will time out in WebKit; Force bypasses visibility and clicks the DOM element directly
         await AddToCartButtons.First.ClickAsync(new LocatorClickOptions { Force = true });
         await ContinueShoppingBtn.ClickAsync();
     }
@@ -70,12 +70,12 @@ public class ProductsPage(IPage page)
         await catLink.ScrollIntoViewIfNeededAsync();
         await catLink.ClickAsync();
         var subCatLink = SubCategoryLink(category, subCategory);
-        // 等元素進入 DOM（WebKit accordion 動畫期間元素是 CSS hidden，Visible 永遠等不到）
+        // Wait for element to be in the DOM (WebKit accordion animation keeps it CSS-hidden, so Visible will never resolve)
         await subCatLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Attached, Timeout = 10000 });
-        // JS native click 繞過 CSS visibility 限制（WebKit accordion）
+        // JS native click bypasses CSS visibility restriction (WebKit accordion)
         await subCatLink.EvaluateAsync("el => el.click()");
-        // WaitForURLAsync：等待 URL 變更為 /category_products/...
-        // 比 WaitForLoadStateAsync 安全：不會在舊頁面已 loaded 時立刻 resolve（Chromium race condition）
+        // WaitForURLAsync: wait for URL to change to /category_products/...
+        // More reliable than WaitForLoadStateAsync: won't immediately resolve if the current page is already loaded (Chromium race condition)
         await page.WaitForURLAsync("**/category_products/**",
             new PageWaitForURLOptions { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 10000 });
     }
@@ -85,9 +85,9 @@ public class ProductsPage(IPage page)
 
     public async Task ClickFirstProductAsync()
     {
-        // .choose div 在 WebKit 可能是 display:none（無 layout box）
-        // Force=true 無效：會點到 (0,0) 座標而非連結本身
-        // 改用：從 DOM 取得 href 屬性，直接以 GotoAsync 導航，完全不依賴 CSS visibility
+        // .choose div may be display:none in WebKit (no layout box)
+        // Force=true won't work: it would click at coordinates (0,0) instead of the link itself
+        // Solution: get the href attribute from the DOM and navigate directly with GotoAsync, bypassing CSS visibility entirely
         var href = await ViewProductLinks.First.EvaluateAsync<string>("el => el.getAttribute('href')");
         await page.GotoAsync(Urls.Base + href,
             new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });

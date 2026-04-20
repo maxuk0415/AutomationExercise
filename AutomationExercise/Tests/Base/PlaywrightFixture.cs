@@ -4,19 +4,19 @@ using AutomationExercise.Pages;
 namespace AutomationExercise.Tests.Base;
 
 /// <summary>
-/// xUnit 版的 Playwright base class。
-/// 實作 IAsyncLifetime 讓 xUnit 在每個 [Fact] 前後自動呼叫 InitializeAsync / DisposeAsync。
+/// xUnit Playwright base class.
+/// Implements IAsyncLifetime so xUnit automatically calls InitializeAsync / DisposeAsync before and after each [Fact].
 ///
-/// 架構設計：
-///   - Browser 層：由 BrowserFixture 管理，整個 test class 只啟動一次（透過 IClassFixture）
-///   - BrowserContext 層：每個 [Fact] 建立獨立的 context，確保 cookie/session 互不影響
-///   - Page 層：每個 [Fact] 有自己的 Page
+/// Architecture:
+///   - Browser layer: managed by BrowserFixture, launched once per test class (via IClassFixture)
+///   - BrowserContext layer: each [Fact] creates an isolated context, ensuring cookies/sessions do not bleed between tests
+///   - Page layer: each [Fact] has its own Page
 ///
-/// 效能優化：
-///   舊架構：每個 test 啟動一次瀏覽器（~1-3 秒 × N 個 test）
-///   新架構：整個 class 只啟動一次瀏覽器，每個 test 只建立 context（~50ms）
+/// Performance:
+///   Old approach: launch a browser for each test (~1-3 seconds × N tests)
+///   New approach: launch the browser once per class, create only a context per test (~50ms)
 ///
-/// 用法：
+/// Usage:
 ///   public class LoginTests : PlaywrightFixture
 ///   {
 ///       public LoginTests(BrowserFixture browser) : base(browser) { }
@@ -34,9 +34,9 @@ public class PlaywrightFixture : IAsyncLifetime
         _browserFixture = browserFixture;
     }
 
-    // InitializeAsync = 每個 [Fact] 執行前自動跑
-    // 建立獨立的 BrowserContext，確保 cookie/localStorage/session 與其他 test 隔離
-    // virtual 讓子 class 可以 override 加入共用的前置步驟（等同 NUnit 的 [SetUp]）
+    // InitializeAsync runs automatically before each [Fact]
+    // Creates an isolated BrowserContext so cookies/localStorage/session are isolated from other tests
+    // virtual allows subclasses to override and add shared setup steps (equivalent to NUnit's [SetUp])
     public virtual async Task InitializeAsync()
     {
         _context = await _browserFixture.Browser.NewContextAsync(new BrowserNewContextOptions
@@ -46,8 +46,8 @@ public class PlaywrightFixture : IAsyncLifetime
 
         Page = await _context.NewPageAsync();
 
-        // 每次頁面載入後自動隱藏廣告 overlay iframe，避免攔截點擊（在 WebKit CI 上特別明顯）
-        // setInterval 每秒執行確保動態插入的廣告也被處理
+        // After each page load, auto-hide ad overlay iframes to prevent them from intercepting clicks (especially noticeable on WebKit CI)
+        // setInterval runs every second to catch dynamically injected ads as well
         await Page.AddInitScriptAsync(@"
             const hideAdOverlays = () => {
                 document.querySelectorAll('iframe[id^=""aswift""]').forEach(el => {
@@ -70,17 +70,17 @@ public class PlaywrightFixture : IAsyncLifetime
         ");
     }
 
-    // DisposeAsync = 每個 [Fact] 執行後自動跑
-    // 關閉 context 會同時清除這個 test 的所有 cookie/session，不影響下一個 test
+    // DisposeAsync runs automatically after each [Fact]
+    // Closing the context clears all cookies/session for this test, without affecting the next test
     public async Task DisposeAsync()
     {
         if (_context != null) await _context.CloseAsync();
     }
 
     /// <summary>
-    /// 處理網站的 Cookie 同意書對話框（Google Funding Choices）。
-    /// 若對話框出現就點擊同意，若未出現則靜默略過。
-    /// 每次導航到新頁面後應呼叫此方法。
+    /// Handles the site's cookie consent dialog (Google Funding Choices).
+    /// Clicks accept if the dialog appears; silently skips if it does not.
+    /// Should be called after each navigation to a new page.
     /// </summary>
     protected async Task DismissConsentDialogAsync()
     {
@@ -90,13 +90,13 @@ public class PlaywrightFixture : IAsyncLifetime
         }
         catch
         {
-            // 同意書未出現，繼續執行
+            // Consent dialog did not appear — continue
         }
     }
 
     /// <summary>
-    /// 共用的登入 helper，讓需要登入的 test 可以直接呼叫。
-    /// 透過 LoginPage 操作，遵守 POM 原則，selector 不重複定義。
+    /// Shared login helper for tests that require an authenticated session.
+    /// Delegates to LoginPage to follow POM principles and avoid duplicating selectors.
     /// </summary>
     protected async Task LoginAsync(string email = Users.ValidEmail, string password = Users.ValidPassword)
     {

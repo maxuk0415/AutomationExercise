@@ -4,11 +4,11 @@ using AutomationExercise.Tests.Base;
 namespace AutomationExercise.Tests.Auth;
 
 /// <summary>
-/// 測試註冊功能：成功建立帳號、使用已存在 Email、空白欄位。
+/// Tests registration: successfully creating an account, using an existing email, empty fields.
 ///
-/// SetUp 策略：helper method
-/// 原因：每個 test 需要不同的起始資料（不同 email、不同欄位組合），
-/// 且成功註冊後需要刪除帳號避免資料累積。
+/// SetUp strategy: helper method
+/// Reason: each test requires different starting data (different email, different field combinations),
+/// and a successfully registered account must be deleted afterwards to avoid data accumulation.
 /// </summary>
 public class RegisterTests : PlaywrightFixture, IClassFixture<BrowserFixture>
 {
@@ -27,13 +27,13 @@ public class RegisterTests : PlaywrightFixture, IClassFixture<BrowserFixture>
     {
         await NavigateToSignupAsync();
 
-        // Step 1：在 Login 頁面輸入 Signup 資料
+        // Step 1: enter Signup details on the Login page
         var loginPage = new LoginPage(Page);
         await loginPage.EnterSignupDetailsAsync(
             Registration.FirstName + " " + Registration.LastName,
             Registration.GenerateUniqueEmail());
 
-        // Step 2：填寫詳細註冊表單
+        // Step 2: fill in the detailed registration form
         var registerPage = new RegisterPage(Page);
         await registerPage.FillAccountDetailsAsync(
             password:  Registration.Password,
@@ -47,10 +47,10 @@ public class RegisterTests : PlaywrightFixture, IClassFixture<BrowserFixture>
             mobile:    Registration.MobilePhone);
         await registerPage.SubmitRegistrationAsync();
 
-        // Step 3：驗證帳號建立成功
+        // Step 3: verify account was created successfully
         Assert.Equal("ACCOUNT CREATED!", await registerPage.GetAccountCreatedMessageAsync());
 
-        // Cleanup：刪除剛建立的帳號，避免測試資料累積
+        // Cleanup: delete the newly created account to prevent test data accumulation
         await Page.ClickAsync("a[data-qa='continue-button']");
         var accountPage = new AccountPage(Page);
         await accountPage.DeleteAccountAsync();
@@ -64,7 +64,7 @@ public class RegisterTests : PlaywrightFixture, IClassFixture<BrowserFixture>
         var loginPage = new LoginPage(Page);
         await loginPage.EnterSignupDetailsAsync(
             name:  Users.ValidName,
-            email: Users.ValidEmail);  // 已存在的 email
+            email: Users.ValidEmail);  // existing email
 
         Assert.Equal(
             "Email Address already exist!",
@@ -79,7 +79,7 @@ public class RegisterTests : PlaywrightFixture, IClassFixture<BrowserFixture>
         var loginPage = new LoginPage(Page);
         await loginPage.EnterSignupDetailsAsync(name: string.Empty, email: "test@example.com");
 
-        // 空白名字觸發 HTML5 native validation，URL 應保持在 /login
+        // An empty name triggers HTML5 native validation — URL should remain at /login
         Assert.Contains(Urls.Login, Page.Url);
     }
 }

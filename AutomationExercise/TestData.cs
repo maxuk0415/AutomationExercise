@@ -14,12 +14,12 @@ public static class Urls
 
 public static class Users
 {
-    // 預先在網站手動建立好的帳號（固定帳號，不每次重新建立）
+    // Pre-created account on the site (fixed account — not recreated on each run)
     public const string ValidEmail    = "max_autotest@example.com";
     public const string ValidPassword = "Test1234!";
     public const string ValidName     = "Max AutoTest";
 
-    // 用於測試「帳號不存在」情境
+    // Used for testing the "account does not exist" scenario
     public const string WrongEmail    = "notexist_xyz@example.com";
     public const string WrongPassword = "WrongPass999!";
 }
@@ -37,8 +37,8 @@ public static class Registration
     public const string MobilePhone = "0987654321";
     public const string Password    = "Register1234!";
 
-    // 動態產生唯一 email，避免「Email Address already exist!」錯誤
-    // 每次呼叫都會生成不同的值，例如 autotest_20260412153045@example.com
+    // Generates a unique email each call to avoid "Email Address already exist!" errors
+    // Each call produces a different value, e.g. autotest_20260412153045@example.com
     public static string GenerateUniqueEmail()
         => $"autotest_{DateTime.UtcNow:yyyyMMddHHmmss}@example.com";
 }
@@ -51,8 +51,8 @@ public static class Products
     public const string SubCategoryDress = "Dress";
     public const string BrandHAndM       = "H&M";
 
-    // 已知的第一筆搜尋結果名稱（搜尋 "Dress" 的第一筆），用於 cart 驗證
-    // 避免「用取得的值驗證取得的值」的低資訊量斷言
+    // Known name of the first search result for keyword "Dress" — used for cart verification
+    // Avoids the low-information assertion of validating a retrieved value against itself
     public const string FirstSearchResult = "Fancy Green Top";
 }
 

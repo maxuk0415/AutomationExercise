@@ -4,18 +4,18 @@ using AutomationExercise.Tests.Base;
 namespace AutomationExercise.Tests.Checkout;
 
 /// <summary>
-/// 測試結帳流程：訂單摘要、付款完成。
+/// Tests the checkout flow: order summary, payment completion.
 ///
-/// SetUp 策略：private helper method
-/// 原因：所有 test 都需要「已登入 + 有商品在購物車 + 已進入 checkout 頁」，
-/// 但不同 test 在 checkout 後的操作不同，所以用 helper 而非 override InitializeAsync。
+/// SetUp strategy: private helper method
+/// Reason: all tests share the same precondition (logged in + item in cart + on checkout page),
+/// but each test performs different actions after reaching checkout, so a helper is used instead of overriding InitializeAsync.
 /// </summary>
 public class CheckoutTests : PlaywrightFixture, IClassFixture<BrowserFixture>
 {
     public CheckoutTests(BrowserFixture browser) : base(browser) { }
 
     /// <summary>
-    /// 共用前置步驟：登入 → 加商品 → 進入 Checkout 頁
+    /// Shared setup: login → add item → navigate to Checkout page
     /// </summary>
     private async Task SetupCheckoutAsync()
     {
@@ -23,12 +23,12 @@ public class CheckoutTests : PlaywrightFixture, IClassFixture<BrowserFixture>
 
         var productsPage = new ProductsPage(Page);
         await productsPage.NavigateAsync();
-        await DismissConsentDialogAsync(); // WebKit 每次 Navigate 後 consent 可能重新出現
+        await DismissConsentDialogAsync(); // consent may reappear after each Navigate in WebKit
         await productsPage.AddFirstProductToCartAsync();
 
         var cartPage = new CartPage(Page);
         await cartPage.NavigateAsync();
-        await DismissConsentDialogAsync(); // 確保結帳按鈕不被遮住
+        await DismissConsentDialogAsync(); // ensure checkout button is not obscured
         await cartPage.ClickCheckoutAsync();
     }
 

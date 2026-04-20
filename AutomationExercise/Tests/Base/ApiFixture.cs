@@ -3,10 +3,10 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Tests.Base;
 
 /// <summary>
-/// API 測試的 base class，使用 Playwright 的 APIRequestContext。
-/// 不啟動 browser，比 E2E fixture 更輕量，適合純 HTTP 測試。
+/// Base class for API tests using Playwright's APIRequestContext.
+/// Does not launch a browser — lighter weight than the E2E fixture, suited for pure HTTP testing.
 ///
-/// 用法：
+/// Usage:
 ///   public class ProductsApiTests : ApiFixture
 ///   {
 ///       [Fact]
@@ -17,9 +17,9 @@ namespace AutomationExercise.Tests.Base;
 ///       }
 ///   }
 ///
-/// 重要：automationexercise.com 的 API 永遠回傳 HTTP 200，
-/// 實際的成功/失敗狀態在 JSON body 的 responseCode 欄位（200=成功，400/404=失敗）。
-/// 所以斷言時必須同時驗證 response.Status 和 responseCode，不能只驗證 HTTP status。
+/// Important: automationexercise.com APIs always return HTTP 200.
+/// The actual success/failure status is in the JSON body's responseCode field (200=success, 400/404=failure).
+/// Assertions must therefore validate both response.Status and responseCode — never just the HTTP status alone.
 /// </summary>
 public class ApiFixture : IAsyncLifetime
 {

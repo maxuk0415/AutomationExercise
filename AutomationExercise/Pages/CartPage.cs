@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責 /view_cart 頁面：查看商品、刪除商品、前往結帳。
+/// Handles the /view_cart page: view items, remove items, proceed to checkout.
 /// </summary>
 public class CartPage(IPage page)
 {
@@ -41,7 +41,7 @@ public class CartPage(IPage page)
     public async Task<bool> IsLoginModalVisibleAsync()
         => await LoginModal.IsVisibleAsync();
 
-    // 用於負向測試：先確認購物車是否為空，避免操作空購物車時 timeout
+    // Used for negative tests: check whether the cart is empty before operating on an empty cart to avoid timeouts
     public async Task<bool> IsCartEmptyAsync()
         => await CartRows.CountAsync() == 0;
 }

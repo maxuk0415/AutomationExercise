@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Pages;
 
 /// <summary>
-/// 負責 /checkout 頁面：確認地址、查看訂單摘要、輸入備註、送出訂單。
+/// Handles the /checkout page: confirm address, view order summary, enter comments, place order.
 /// </summary>
 public class CheckoutPage(IPage page)
 {
@@ -31,7 +31,7 @@ public class CheckoutPage(IPage page)
     {
         await PlaceOrderBtn.ScrollIntoViewIfNeededAsync();
         await PlaceOrderBtn.ClickAsync();
-        // 不用 WaitForURLAsync：付款頁面 URL 格式不固定（可能含 query string 或不同 path）
-        // 改由 FillPaymentDetailsAsync 內的 WaitForAsync 確保付款表單已出現
+        // Not using WaitForURLAsync: the payment page URL format is inconsistent (may include query strings or different paths)
+        // Instead, the WaitForAsync inside FillPaymentDetailsAsync ensures the payment form has appeared
     }
 }

@@ -3,16 +3,16 @@ using Microsoft.Playwright;
 namespace AutomationExercise.Tests.Base;
 
 /// <summary>
-/// 管理 Browser 的生命週期，整個 test class 只建立一次 browser。
+/// Manages the Browser lifecycle, launching it only once per test class.
 ///
-/// 使用方式：在 test class 上加 [Collection("Browser")]，
-/// 所有同一個 Collection 的 test class 共用同一個 browser instance。
+/// Usage: add [Collection("Browser")] to the test class.
+/// All test classes in the same Collection share the same browser instance.
 ///
-/// 架構說明：
-///   BrowserFixture（整個 Collection 共用，只啟動一次瀏覽器）
-///       └── PlaywrightFixture（每個 [Fact] 建立新的 BrowserContext，達到 session 隔離）
+/// Architecture:
+///   BrowserFixture (shared across the entire Collection — browser launched only once)
+///       └── PlaywrightFixture (each [Fact] creates a new BrowserContext for session isolation)
 ///
-/// 對應 NUnit 的概念：
+/// NUnit equivalents:
 ///   BrowserFixture ≈ [OneTimeSetUp] at assembly level
 ///   PlaywrightFixture.InitializeAsync ≈ [SetUp]
 /// </summary>

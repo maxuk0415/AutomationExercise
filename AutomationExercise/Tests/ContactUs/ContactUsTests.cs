@@ -4,10 +4,10 @@ using AutomationExercise.Tests.Base;
 namespace AutomationExercise.Tests.ContactUs;
 
 /// <summary>
-/// 測試聯絡表單功能：送出表單、導回首頁。
+/// Tests the contact form: submitting the form, navigating back to home.
 ///
-/// SetUp 策略：override InitializeAsync
-/// 原因：所有測試都從 /contact_us 開始，統一導航。
+/// SetUp strategy: override InitializeAsync
+/// Reason: all tests start from /contact_us, so navigation is centralised here.
 /// </summary>
 public class ContactUsTests : PlaywrightFixture, IClassFixture<BrowserFixture>
 {

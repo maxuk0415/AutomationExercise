@@ -5,23 +5,23 @@ using AutomationExercise.Tests.Base;
 namespace AutomationExercise.Tests.Api;
 
 /// <summary>
-/// API 測試：使用 Playwright 的 APIRequestContext（不啟動 browser）。
+/// API tests using Playwright's APIRequestContext (no browser launched).
 ///
-/// 重要設計說明：
-///   automationexercise.com 的 API 永遠回傳 HTTP 200，
-///   實際結果在 JSON body 的 responseCode 欄位（200=成功，400=缺少參數，404=帳號不存在，405=Method Not Allowed）。
-///   因此每個測試必須同時驗證 HTTP status（永遠是 200）和 responseCode（實際語意）。
+/// Important design note:
+///   automationexercise.com APIs always return HTTP 200.
+///   The actual result is in the JSON body's responseCode field (200=success, 400=missing params, 404=account not found, 405=Method Not Allowed).
+///   Each test must therefore assert both the HTTP status (always 200) and responseCode (actual semantic result).
 ///
-/// 用 System.Text.Json 解析 JSON body，避免額外安裝套件。
+/// System.Text.Json is used to parse JSON responses — no additional packages required.
 /// </summary>
 public class ApiTests : ApiFixture
 {
     // ──────────────────────────────────────────
-    // 輔助方法：解析 JSON body 取出 responseCode
+    // Helper methods: parse responseCode from JSON body
     // ──────────────────────────────────────────
 
     /// <summary>
-    /// 從 response body 的 JSON 解析出 responseCode 欄位。
+    /// Parses the responseCode field from the response body JSON.
     /// </summary>
     private static async Task<int> GetResponseCodeAsync(IAPIResponse response)
     {
@@ -31,8 +31,8 @@ public class ApiTests : ApiFixture
     }
 
     /// <summary>
-    /// 從 response body 的 JSON 解析出某個陣列欄位的元素數量。
-    /// 例如 products → "products" array，brands → "brands" array。
+    /// Parses the element count of a named array field from the response body JSON.
+    /// For example: products → "products" array, brands → "brands" array.
     /// </summary>
     private static async Task<int> GetArrayCountAsync(IAPIResponse response, string arrayKey)
     {
@@ -61,7 +61,7 @@ public class ApiTests : ApiFixture
     {
         var response = await ApiContext.PostAsync("/api/productsList", null);
 
-        Assert.Equal(200, response.Status); // 網站永遠回傳 HTTP 200
+        Assert.Equal(200, response.Status); // site always returns HTTP 200
         Assert.Equal(405, await GetResponseCodeAsync(response));
     }
 
